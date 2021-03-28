@@ -36,7 +36,7 @@ export default class NYTFetch extends Component<Props, State> {
         let baseurl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json';
         let key = 'yNAfGKoT8HNTi3H6JcUFFxdwi8jeXt5e';
 
-        let searchURL = `${baseurl}?api-key=${key}&page=${this.state.pageNumber}`;
+        let searchURL = `${baseurl}?api-key=${key}&page=${this.state.pageNumber}&q=${this.state.searchTerm}`;
         
         if (this.state.startDate !== ''){
             searchURL += '&begin_date=' + this.state.startDate;
@@ -49,7 +49,7 @@ export default class NYTFetch extends Component<Props, State> {
         fetch(searchURL)
             .then((res) => res.json())
             .then((json) => {
-                console.log(json.response.docs);
+                // console.log(json.response.docs);
                 //this captures the array vs the entire object
                 this.setResults(json);
             })
@@ -61,7 +61,7 @@ export default class NYTFetch extends Component<Props, State> {
 
     searchFetch(e: any){
         this.setState({
-            searchTerm: e
+            searchTerm: e.toLocaleLowerCase()
         })
     }
 
