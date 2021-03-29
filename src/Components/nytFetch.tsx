@@ -27,7 +27,8 @@ export default class NYTFetch extends Component<Props, State> {
             pageNumber: 0,
             results: []
         }
-        this.fetchResults = this.fetchResults.bind(this)
+        this.fetchResults = this.fetchResults.bind(this);
+        this.inputCompiler = this.inputCompiler.bind(this);
     }
 
     fetchResults(e?: any) {
@@ -58,21 +59,11 @@ export default class NYTFetch extends Component<Props, State> {
         this.setState({results: json})
     }
 
-    searchFetch(e: any){
+    inputCompiler(e: any) {
+        const value = e.target.value
         this.setState({
-            searchTerm: e.toLocaleLowerCase()
-        })
-    }
-
-    startDateFetch(e: any){
-        this.setState({
-            startDate: e
-        })
-    }
-
-    endDateFetch(e: any){
-        this.setState({
-            endDate: e
+            ...this.state,
+            [e.target.name]: value
         })
     }
 
@@ -87,7 +78,7 @@ export default class NYTFetch extends Component<Props, State> {
 
     pageIncrementOnClick = async (e: any) =>{
         console.log(this.state.pageNumber)
-        await this.setState({pageNumber: this.state.pageNumber + 1})
+        await this.setState((prevState) => ({pageNumber: prevState.pageNumber + 1}))
         console.log(this.state.pageNumber)
         this.fetchResults(e);
     }
@@ -95,7 +86,7 @@ export default class NYTFetch extends Component<Props, State> {
     pageDecrementOnClick = async (e: any) => {
         console.log(this.state.pageNumber);
         if (this.state.pageNumber > 0){
-            await this.setState({pageNumber: this.state.pageNumber - 1})
+            await this.setState((prevState) => ({pageNumber: prevState.pageNumber - 1}))
             this.fetchResults(e);
         } else {
             await this.setState({pageNumber: 0})
@@ -112,16 +103,16 @@ export default class NYTFetch extends Component<Props, State> {
                   <Col>  
                     <Form onSubmit={this.fetchResults} style={{margin: "4em"}}>
                         <FormGroup>
-                            <Label htmlFor='search'>Enter a SINGLE search term (required): </Label>
-                            <Input name='search' placeholder='i.e. Grateful Dead'  type='text' value={this.state.searchTerm} onChange={(e) => this.searchFetch(e.target.value)} required/>
+                            <Label htmlFor='searchTerm'>Enter a SINGLE search term (required): </Label>
+                            <Input name='searchTerm' placeholder='i.e. Grateful Dead'  type='text' value={this.state.searchTerm} onChange={this.inputCompiler} required/>
                         </FormGroup>
                         <FormGroup>
-                            <Label htmlFor='start-date'>Enter a start date (format YYYYMMDD):</Label>
-                            <Input name='start-date' type='date' pattern='[0-9]{8}' value={this.state.startDate} onChange={(e) => this.startDateFetch(e.target.value)}/>
+                            <Label htmlFor='startDate'>Enter a start date (format YYYYMMDD):</Label>
+                            <Input name='startDate' type='date' pattern='[0-9]{8}' value={this.state.startDate} onChange={this.inputCompiler}/>
                         </FormGroup>
                         <FormGroup>
-                            <Label htmlFor='end-date'>Enter an end date (format YYYYMMDD):</Label>
-                            <Input name='end-date' type='date' pattern='[0-9]{8}' value={this.state.endDate} onChange={(e) => this.endDateFetch(e.target.value)}/>
+                            <Label htmlFor='endDate'>Enter an end date (format YYYYMMDD):</Label>
+                            <Input name='endDate' type='date' pattern='[0-9]{8}' value={this.state.endDate} onChange={this.inputCompiler}/>
                         </FormGroup>
                         <Button type='submit'>Search</Button>
                     </Form>
@@ -140,7 +131,12 @@ export default class NYTFetch extends Component<Props, State> {
                     }
                   </Col>
                   <Col>  
-                    <DisplayResults results={this.state.results}/>
+                  <br/>
+                  <br/>
+                    {this.state.results.length === 0
+                        ? <h2 style={{marginRight: '1em'}}>No results.</h2>
+                        : <DisplayResults results={this.state.results}/>
+                    }
                   </Col>
                 </Row>
             </div>
